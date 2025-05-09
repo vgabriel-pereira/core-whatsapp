@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Ferramenta WhatsApp</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container" style="max-width: 500px; margin-top: 50px;">
+    <div class="card">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <img src="./image/logo core-df.png" alt="Logo" style="height: 80px; margin-bottom: 15px;">
+        <h1 style="color: var(--dark-color);">Acesse sua conta</h1>
+      </div>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Usuário:</label>
+          <input type="text" id="username" name="username" class="form-control" required placeholder="Digite seu usuário">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Senha:</label>
+          <input type="password" id="password" name="password" class="form-control" required placeholder="Digite sua senha">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Entrar</button>
+      </form>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <p>Não tem uma conta? <a href="#" style="color: var(--primary-color);">Contate o administrador</a></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

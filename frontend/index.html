@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ferramenta de Envio - WhatsApp</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container navbar">
+      <h1>
+        <img src="./image/logo core-df.png" alt="Logo" >
+        Ferramenta de Envio de Mensagens
+      </h1>
+      <button class="logout-btn">Sair</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h2 style="color: var(--dark-color); margin-bottom: 20px;">Bem-vindo à Ferramenta de Envio</h2>
+      <p>Esta ferramenta permite o envio automatizado de mensagens via WhatsApp para múltiplos contatos simultaneamente.</p>
+      
+      <h3 style="margin: 25px 0 15px; color: var(--dark-color);">Como usar:</h3>
+      <ol style="margin-left: 20px; margin-bottom: 20px;">
+        <li style="margin-bottom: 10px;">Na página <strong>"Nova Campanha"</strong>, insira sua mensagem e faça upload da planilha com os contatos</li>
+        <li style="margin-bottom: 10px;">Acompanhe o progresso dos envios na página <strong>"Gerenciar Envios"</strong></li>
+        <li>Após o término, você pode limpar os registros para iniciar uma nova campanha</li>
+      </ol>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-card">
+        <h2>Nova Campanha</h2>
+        <p>Crie e envie uma nova campanha de mensagens para seus contatos</p>
+        <a href="disparo.html" class="btn btn-primary">Iniciar</a>
+      </div>
+      
+      <div class="dashboard-card">
+        <h2>Gerenciar Envios</h2>
+        <p>Acompanhe o status e progresso das mensagens enviadas</p>
+        <a href="envio.html" class="btn btn-primary">Visualizar</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.querySelector('.logout-btn').addEventListener('click', () => {
+      if(confirm('Deseja realmente sair?')) {
+        window.location.href = 'login.html';
+      }
+    });
+  </script>
+</body>
+</html>

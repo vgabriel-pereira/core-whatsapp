@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Campanha - WhatsApp</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container navbar">
+      <h1>
+        <img src="./image/logo core-df.png" alt="Logo">
+        Nova Campanha
+      </h1>
+      <div class="nav-links">
+        <a href="index.html" class="btn btn-secondary">Voltar</a>
+        <button class="logout-btn">Sair</button>
+      </div>
+    </div>
+  </header>
+  
+  <main class="container">
+    <div class="card" style="margin-bottom: 20px;">
+      <h3 style="color: var(--dark-color); margin-bottom: 15px;">Preparação dos Dados</h3>
+      <p>Baixe nosso modelo de planilha para garantir o formato correto:</p>
+      
+      <div class="download-box">
+        <a href="./image/modelo_contatos.xlsx" download class="btn btn-secondary" style="margin-top: 10px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px;">
+            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+          </svg>
+          Baixar Modelo (.xlsx)
+        </a>
+        <p style="font-size: 0.8rem; margin-top: 10px; color: #666;">
+          <strong>Observação:</strong> Mantenha os cabeçalhos "nome" e "telefone" na primeira linha
+        </p>
+      </div>
+    </div>
+    <div class="card">
+      <h2 style="color: var(--dark-color); margin-bottom: 20px;">Criar Nova Campanha</h2>
+      
+      <form id="disparo-form" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="message">Mensagem:</label>
+          <textarea id="message" name="message" class="form-control" required placeholder="Digite a mensagem que será enviada"></textarea>
+          <small style="color: #666;">Use {nome} para personalizar com o nome do contato</small>
+        </div>
+
+        <div class="form-group">
+          <label for="file">Planilha de Contatos (.xlsx):</label>
+          <input type="file" id="file" name="file" class="form-control" accept=".xlsx" required />
+          <small style="color: #666;">A planilha deve conter colunas 'nome' e 'telefone'</small>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <button type="submit" class="btn btn-primary" style="padding: 12px 30px; font-size: 16px;">
+            Iniciar Campanha
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="whatsapp-status">
+      <h2>Status do WhatsApp</h2>
+      <p id="status-text">Verificando conexão...</p>
+      <div id="qr-code-container" class="qr-code-container" style="display: none;">
+        <p>Escaneie este QR Code com o WhatsApp no seu celular:</p>
+        <img id="qr-code" class="qr-code" alt="QR Code para conectar ao WhatsApp" />
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    // Logout
+    document.querySelector('.logout-btn').addEventListener('click', () => {
+      if(confirm('Deseja realmente sair?')) {
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Verificar status do WhatsApp
+    async function checkWhatsAppStatus() {
+      try {
+        const statusRes = await fetch('http://localhost:3000/message/status');
+        const { connected } = await statusRes.json();
+
+        const statusText = document.getElementById('status-text');
+        const qrContainer = document.getElementById('qr-code-container');
+
+        if (connected) {
+          statusText.innerHTML = '✅ <strong>WhatsApp conectado!</strong> Você pode iniciar o envio de mensagens.';
+          qrContainer.style.display = 'none';
+        } else {
+          statusText.innerHTML = '❌ <strong>WhatsApp não conectado.</strong> Escaneie o QR Code abaixo para conectar:';
+          const qrRes = await fetch('http://localhost:3000/message/qr');
+          const { qr } = await qrRes.json();
+          document.getElementById('qr-code').src = qr;
+          qrContainer.style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Erro ao verificar status do WhatsApp:', err);
+        document.getElementById('status-text').textContent = 'Erro ao verificar status do WhatsApp.';
+      }
+    }
+
+    checkWhatsAppStatus();
+    setInterval(checkWhatsAppStatus, 5000);
+  </script>
+</body>
+</html>

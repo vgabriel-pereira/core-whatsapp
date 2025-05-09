@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciamento de Envios - WhatsApp</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container navbar">
+      <h1>
+        <img src="./image/logo core-df.png" alt="Logo">
+        Gerenciamento de Envios
+      </h1>
+      <div class="nav-links">
+        <a href="index.html" class="btn btn-secondary">Voltar</a>
+        <button class="logout-btn">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <div id="top-actions" style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+        <div style="flex: 1; min-width: 200px;">
+          <label for="status-filter" class="form-group label">Status:</label>
+          <select id="status-filter" class="form-control" onchange="fetchContacts()">
+            <option value="todos">Todos</option>
+            <option value="pending">Pendente</option>
+            <option value="sent">Enviado</option>
+            <option value="error">Erro</option>
+          </select>
+        </div>
+        
+        <div style="flex: 2; min-width: 250px;">
+          <label for="search" class="form-group label">Buscar:</label>
+          <input type="text" id="search" class="form-control" placeholder="Buscar por nome ou telefone" oninput="fetchContacts()">
+        </div>
+        
+        <div style="display: flex; align-items: flex-end;">
+          <button onclick="deleteSent()" class="btn btn-danger">Apagar campanha</button>
+        </div>
+      </div>
+
+      <div id="stats" class="status-info" style="padding: 10px; background: var(--light-gray); border-radius: 5px; margin-bottom: 15px;"></div>
+
+      <div id="loading" class="loading" style="display:none;">
+        <div class="spinner"></div>
+        <span style="margin-left: 10px;">Carregando contatos...</span>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table id="contacts-table" class="data-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Telefone</th>
+              <th>Status</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    async function fetchContacts() {
+      document.getElementById('loading').style.display = 'flex';
+      
+      const status = document.getElementById('status-filter').value;
+      const search = document.getElementById('search').value;
+
+      try {
+        const res = await fetch(`http://localhost:3000/message/contacts?status=${status}&search=${search}`);
+        const contacts = await res.json();
+
+        const tbody = document.querySelector('#contacts-table tbody');
+        tbody.innerHTML = '';
+
+        let sentCount = 0, pendingCount = 0, errorCount = 0;
+
+        contacts.forEach(c => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${c.name || '---'}</td>
+            <td>${c.phone}</td>
+            <td><span class="status-badge status-${c.status}">${c.status}</span></td>
+            <td>${new Date(c.createdAt).toLocaleString()}</td>
+          `;
+          tbody.appendChild(tr);
+
+          if (c.status === 'sent') sentCount++;
+          if (c.status === 'pending') pendingCount++;
+          if (c.status === 'error') errorCount++;
+        });
+
+        document.getElementById('stats').innerHTML = `
+          <strong>Resumo:</strong>
+          <span style="color: var(--primary-color); margin-left: 15px;">✅ Enviadas: ${sentCount}</span>
+          <span style="color: var(--warning-color); margin-left: 15px;">⏳ Pendentes: ${pendingCount}</span>
+          <span style="color: var(--danger-color); margin-left: 15px;">❌ Erros: ${errorCount}</span>
+        `;
+      } catch (err) {
+        console.error('Erro ao carregar contatos:', err);
+        alert('Erro ao carregar contatos. Tente novamente.');
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    async function deleteSent() {
+      const confirmed = confirm('Tem certeza que deseja apagar TODOS os registros desta campanha? Esta ação não pode ser desfeita.');
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch('http://localhost:3000/message/delete-sent', {
+          method: 'DELETE',
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert('Campanha apagada com sucesso!');
+          fetchContacts();
+        } else {
+          alert(data.message || 'Erro ao apagar campanha.');
+        }
+      } catch (err) {
+        console.error('Erro ao apagar campanha:', err);
+        alert('Erro ao se comunicar com o servidor.');
+      }
+    }
+
+    // Carrega os contatos imediatamente e a cada 15 segundos
+    fetchContacts();
+    setInterval(fetchContacts, 15000);
+
+    // Logout
+    document.querySelector('.logout-btn').addEventListener('click', () => {
+      if(confirm('Deseja realmente sair?')) {
+        window.location.href = 'login.html';
+      }
+    });
+  </script>
+</body>
+</html>
